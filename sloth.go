@@ -13,8 +13,7 @@ import (
 func main() {
 	flag.Parse()
 	urls := flag.Args()
-	results := getTimings(urls)
-	fmt.Println("Result: ", Green(<-results))
+	getTimings(urls)
 }
 
 type Result struct {
