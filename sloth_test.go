@@ -1,18 +1,19 @@
 package main
 
 import (
-	"bytes"
-	"strings"
 	"testing"
 )
 
 func Test(t *testing.T) {
-	var buf bytes.Buffer
-	urls := []string{"htt://stonedemo.wtf", "https://apex.sh"}
-	Sloth(&buf, urls)
-	for _, u := range urls {
-		if !strings.Contains(buf.String(), u) {
-			t.Fatalf("expected %q in output", u)
+	urls := []string{"http://stonedemo.wtf", "https://apex.sh"}
+	results := make(chan Result)
+	go Sloth(urls, results)
+	for a := 0; a < len(urls); a++ {
+		r := <-results
+		if r.Error != nil {
+			t.Fatalf("error: %s", r.Error)
+			continue
 		}
 	}
+	close(results)
 }

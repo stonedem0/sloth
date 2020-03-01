@@ -3,9 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"sync"
 	"time"
 
@@ -15,7 +13,13 @@ import (
 func main() {
 	flag.Parse()
 	urls := flag.Args()
-	Sloth(os.Stdout, urls)
+	results := make(chan Result)
+	go Sloth(urls, results)
+	for a := 0; a < len(urls); a++ {
+		r := <-results
+		fmt.Println(aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
+	}
+	close(results)
 }
 
 type Result struct {
@@ -24,24 +28,24 @@ type Result struct {
 	URL      string
 }
 
-func Sloth(w io.Writer, urls []string) <-chan Result {
+func Sloth(urls []string, res chan Result) {
 	var wg sync.WaitGroup
 	wg.Add(len(urls))
-	res := make(chan Result)
 	for _, val := range urls {
 		go func(val string) {
 			defer wg.Done()
 			start := time.Now()
+
 			_, err := http.Get(val)
 			if err != nil {
-				panic(err)
+				res <- Result{URL: val, Error: err}
+				return
 			}
+
 			elapsed := time.Since(start).Round(time.Millisecond)
-			r := Result{Duration: elapsed, URL: val}
-			fmt.Fprintln(w, aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
+			res <- Result{Duration: elapsed, URL: val}
 		}(val)
 	}
-	close(res)
+
 	wg.Wait()
-	return res
 }
