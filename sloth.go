@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -13,7 +15,7 @@ import (
 func main() {
 	flag.Parse()
 	urls := flag.Args()
-	Sloth(urls)
+	Sloth(os.Stdout, urls)
 }
 
 type Result struct {
@@ -22,7 +24,7 @@ type Result struct {
 	URL      string
 }
 
-func Sloth(urls []string) <-chan Result {
+func Sloth(w io.Writer, urls []string) <-chan Result {
 	var wg sync.WaitGroup
 	wg.Add(len(urls))
 	res := make(chan Result)
@@ -36,7 +38,7 @@ func Sloth(urls []string) <-chan Result {
 			}
 			elapsed := time.Since(start).Round(time.Millisecond)
 			r := Result{Duration: elapsed, URL: val}
-			fmt.Println(aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
+			fmt.Fprintln(w, aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
 		}(val)
 	}
 	close(res)
