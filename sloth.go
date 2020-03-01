@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	. "github.com/logrusorgru/aurora"
+	"github.com/logrusorgru/aurora"
 )
 
 func main() {
@@ -36,7 +36,7 @@ func getTimings(urls []string) <-chan Result {
 			}
 			elapsed := time.Since(start).Round(time.Millisecond)
 			r := Result{Duration: elapsed, URL: val}
-			fmt.Println(Yellow("Response from: "), Green(r.URL), Yellow("took: "), Magenta(r.Duration))
+			fmt.Println(aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
 		}(val)
 
 	}
