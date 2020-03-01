@@ -13,7 +13,7 @@ import (
 func main() {
 	flag.Parse()
 	urls := flag.Args()
-	getTimings(urls)
+	Sloth(urls)
 }
 
 type Result struct {
@@ -22,7 +22,7 @@ type Result struct {
 	URL      string
 }
 
-func getTimings(urls []string) <-chan Result {
+func Sloth(urls []string) <-chan Result {
 	var wg sync.WaitGroup
 	wg.Add(len(urls))
 	res := make(chan Result)
@@ -38,7 +38,6 @@ func getTimings(urls []string) <-chan Result {
 			r := Result{Duration: elapsed, URL: val}
 			fmt.Println(aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
 		}(val)
-
 	}
 	close(res)
 	wg.Wait()
