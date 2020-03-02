@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -16,6 +17,7 @@ func main() {
 	results := make(chan Result)
 	go Sloth(args, results)
 	printResult(args, results)
+	// dnsLookup()
 }
 
 type Result struct {
@@ -49,6 +51,14 @@ func Sloth(urls []string, res chan Result) {
 	wg.Wait()
 }
 
+// func dnsLookup() {
+// 	addr, err := net.LookupIP("https://stonedemo.wtf")
+// 	if err != nil {
+// 		fmt.Println("Unknown host")
+// 	} else {
+// 		fmt.Println("IP address: ", addr)
+// 	}
+// }
 func printResult(args []string, res chan Result) {
 	for a := 0; a < len(args); a++ {
 		r := <-res
@@ -63,6 +73,10 @@ func printResult(args []string, res chan Result) {
 					fmt.Print(" : ")
 					fmt.Println(aurora.Magenta(v))
 				}
+				return
+			case "-dns":
+				ips, _ := net.LookupIP(r.URL)
+				fmt.Println(aurora.Magenta(ips))
 				return
 			}
 		}

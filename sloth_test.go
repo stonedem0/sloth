@@ -5,7 +5,7 @@ import (
 )
 
 func Test(t *testing.T) {
-	urls := []string{"http://stonedemo.wtf", "https://apex.sh"}
+	urls := []string{"https://stonedemo.wtf", "https://apex.sh"}
 	results := make(chan Result)
 	go Sloth(urls, results)
 	for a := 0; a < len(urls); a++ {
