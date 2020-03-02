@@ -15,25 +15,7 @@ func main() {
 	args := flag.Args()
 	results := make(chan Result)
 	go Sloth(args, results)
-	for a := 0; a < len(args); a++ {
-		r := <-results
-		if len(args) > 1 {
-			switch args[1] {
-			case "-s":
-				fmt.Println(aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
-				return
-			case "-h":
-				for k, v := range r.Header {
-					fmt.Print(aurora.Green(k))
-					fmt.Print(" : ")
-					fmt.Println(aurora.Magenta(v))
-				}
-				return
-			}
-		}
-
-	}
-	close(results)
+	printResult(args, results)
 }
 
 type Result struct {
@@ -65,4 +47,26 @@ func Sloth(urls []string, res chan Result) {
 	}(val)
 	//}
 	wg.Wait()
+}
+
+func printResult(args []string, res chan Result) {
+	for a := 0; a < len(args); a++ {
+		r := <-res
+		if len(args) > 1 {
+			switch args[1] {
+			case "-s":
+				fmt.Println(aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
+				return
+			case "-h":
+				for k, v := range r.Header {
+					fmt.Print(aurora.Green(k))
+					fmt.Print(" : ")
+					fmt.Println(aurora.Magenta(v))
+				}
+				return
+			}
+		}
+
+	}
+	close(res)
 }
