@@ -12,12 +12,26 @@ import (
 
 func main() {
 	flag.Parse()
-	urls := flag.Args()
+	args := flag.Args()
 	results := make(chan Result)
-	go Sloth(urls, results)
-	for a := 0; a < len(urls); a++ {
+	go Sloth(args, results)
+	for a := 0; a < len(args); a++ {
 		r := <-results
-		fmt.Println(aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
+		if len(args) > 1 {
+			switch args[1] {
+			case "-s":
+				fmt.Println(aurora.Yellow("Response from: "), aurora.Green(r.URL), aurora.Yellow("took: "), aurora.Magenta(r.Duration))
+				return
+			case "-h":
+				for k, v := range r.Header {
+					fmt.Print(aurora.Green(k))
+					fmt.Print(" : ")
+					fmt.Println(aurora.Magenta(v))
+				}
+				return
+			}
+		}
+
 	}
 	close(results)
 }
@@ -26,37 +40,29 @@ type Result struct {
 	Error    error
 	Duration time.Duration
 	URL      string
+	Header   http.Header
 }
 
 // Sloth ...
 func Sloth(urls []string, res chan Result) {
 	var wg sync.WaitGroup
 	wg.Add(len(urls))
-	for _, val := range urls {
-		go func(val string) {
-			defer wg.Done()
-			start := time.Now()
+	//for _, val := range urls {
+	val := urls[0]
+	go func(val string) {
+		defer wg.Done()
+		start := time.Now()
 
-			r, err := http.Get(val)
-			if err != nil {
-				res <- Result{URL: val, Error: err}
-				return
-			}
-			defer r.Body.Close()
-			// body, err := ioutil.ReadAll(r.Body)
-			// bodyString := string(body)
-			// for k, v := range r.Header {
-			// 	fmt.Print(k)
-			// 	fmt.Print(" : ")
-			// 	fmt.Println(v)
-			// }
-			// println(bodyString)
-			// fmt.Println(net.LookupAddr("127.0.0.1"))
-
-			elapsed := time.Since(start).Round(time.Millisecond)
-			res <- Result{Duration: elapsed, URL: val}
-		}(val)
-	}
-
+		r, err := http.Get(val)
+		if err != nil {
+			res <- Result{URL: val, Error: err}
+			return
+		}
+		defer r.Body.Close()
+		header := r.Header
+		elapsed := time.Since(start).Round(time.Millisecond)
+		res <- Result{Duration: elapsed, URL: val, Header: header}
+	}(val)
+	//}
 	wg.Wait()
 }
