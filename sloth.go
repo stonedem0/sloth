@@ -43,16 +43,6 @@ func Sloth(urls []string, res chan Result) {
 				return
 			}
 			defer r.Body.Close()
-			// body, err := ioutil.ReadAll(r.Body)
-			// bodyString := string(body)
-			// for k, v := range r.Header {
-			// 	fmt.Print(k)
-			// 	fmt.Print(" : ")
-			// 	fmt.Println(v)
-			// }
-			// println(bodyString)
-			// fmt.Println(net.LookupAddr("127.0.0.1"))
-
 			elapsed := time.Since(start).Round(time.Millisecond)
 			res <- Result{Duration: elapsed, URL: val}
 		}(val)
