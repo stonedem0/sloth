@@ -50,15 +50,6 @@ func Sloth(urls []string, res chan Result) {
 	//}
 	wg.Wait()
 }
-
-// func dnsLookup() {
-// 	addr, err := net.LookupIP("https://stonedemo.wtf")
-// 	if err != nil {
-// 		fmt.Println("Unknown host")
-// 	} else {
-// 		fmt.Println("IP address: ", addr)
-// 	}
-// }
 func printResult(args []string, res chan Result) {
 	for a := 0; a < len(args); a++ {
 		r := <-res
