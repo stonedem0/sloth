@@ -20,25 +20,21 @@ func main() {
 	for a := 0; a < len(urls)**count; a++ {
 		r := <-results
 		m[r.URL] = append(m[r.URL], r.Duration)
-		fmt.Println(r.URL, r.Duration)
 		if r.Error == nil {
-			fmt.Printf("Response %-5d from %s took %s\n", aurora.Yellow(r.Index), aurora.Green(r.URL), aurora.Magenta(r.Duration))
+			// fmt.Printf("Response %-5d from %s took %s\n", aurora.Yellow(r.Index), aurora.Green(r.URL), aurora.Magenta(r.Duration))
 			continue
 		}
 		fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
-		// var sum time.Duration
-		// for _, t := range tmp {
-		// 	sum = sum + t
-		// }
 	}
-	fmt.Println(m)
 	close(results)
-	// var sum time.Duration
-	// for _, t := range tmp {
-	// 	sum = sum + t
-	// }
-	// fmt.Printf("Average respond speed: %s\n", aurora.Magenta(sum/time.Duration(*count)))
-	// fmt.Println(m)
+	msg := "Average respond time for"
+	for k, v := range m {
+		var sum time.Duration
+		for _, s := range v {
+			sum = sum + s
+		}
+		fmt.Printf("%s %s: %s\n", aurora.Yellow(msg), aurora.Green(k), aurora.Magenta(sum/time.Duration(*count)))
+	}
 }
 
 type Result struct {
