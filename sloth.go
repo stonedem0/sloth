@@ -15,19 +15,19 @@ func main() {
 	flag.Parse()
 	urls := flag.Args()
 	results := make(chan Result)
-	var m = map[string][]time.Duration{}
+	m := map[string][]time.Duration{}
 	go Sloth(urls, *count, results)
 	for a := 0; a < len(urls)**count; a++ {
 		r := <-results
 		m[r.URL] = append(m[r.URL], r.Duration)
 		if r.Error == nil {
-			// fmt.Printf("Response %-5d from %s took %s\n", aurora.Yellow(r.Index), aurora.Green(r.URL), aurora.Magenta(r.Duration))
 			continue
 		}
 		fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
 	}
 	close(results)
 	msg := "Average respond time for"
+
 	for k, v := range m {
 		var sum time.Duration
 		for _, s := range v {
@@ -37,6 +37,7 @@ func main() {
 	}
 }
 
+// Result ...
 type Result struct {
 	Error    error
 	Index    int
