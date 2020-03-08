@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -15,19 +16,22 @@ func main() {
 	flag.Parse()
 	urls := flag.Args()
 	results := make(chan Result)
+	total := len(urls) * *count
+	// colors := []uint8{57, 93, 129, 165, 201}
 	m := map[string][]time.Duration{}
 	go Sloth(urls, *count, results)
-	for a := 0; a < len(urls)**count; a++ {
+	for a := 0; a < total; a++ {
 		r := <-results
 		m[r.URL] = append(m[r.URL], r.Duration)
 		if r.Error == nil {
+			progressBar(float32(a)/float32(total), 20)
 			continue
 		}
 		fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
 	}
 	close(results)
+	fmt.Printf("\n")
 	msg := "Average respond time for"
-
 	for k, v := range m {
 		var sum time.Duration
 		for _, s := range v {
@@ -66,4 +70,9 @@ func Sloth(urls []string, count int, res chan Result) {
 		}
 	}
 	wg.Wait()
+}
+
+func printProgressBar(percent float32, width int) {
+	s := int(float32(width) * float32(percent))
+	fmt.Printf("\r  %s %%%d", aurora.Index(200, strings.Repeat("■ ", s)), int(percent*100))
 }
