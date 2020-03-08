@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/logrusorgru/aurora"
 )
@@ -24,7 +24,7 @@ func main() {
 		r := <-results
 		m[r.URL] = append(m[r.URL], r.Duration)
 		if r.Error == nil {
-			progressBar(float32(a)/float32(total), 20)
+			printProgressBar(float32(a) / float32(total))
 			continue
 		}
 		fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
@@ -72,7 +72,17 @@ func Sloth(urls []string, count int, res chan Result) {
 	wg.Wait()
 }
 
-func printProgressBar(percent float32, width int) {
-	s := int(float32(width) * float32(percent))
-	fmt.Printf("\r  %s %%%d", aurora.Index(200, strings.Repeat("■ ", s)), int(percent*100))
+var progressBar string
+
+func init() {
+	colors := []uint8{57, 93, 129, 165, 201}
+	for _, c := range colors {
+		progressBar += aurora.Index(c, "■ ■ ■ ■ ").String()
+	}
+}
+func printProgressBar(percent float32) {
+	size := utf8.RuneCountInString(progressBar)
+	index := int(float32(size) * float32(percent))
+	bar := string([]rune(progressBar)[0:index])
+	fmt.Printf("\r  %s %%%d", bar, int(percent*100))
 }
