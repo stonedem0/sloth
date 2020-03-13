@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 	"unicode/utf8"
@@ -17,7 +18,6 @@ func main() {
 	urls := flag.Args()
 	results := make(chan Result)
 	total := len(urls) * *count
-	// colors := []uint8{57, 93, 129, 165, 201}
 	m := map[string][]time.Duration{}
 	go Sloth(urls, *count, results)
 	for a := 0; a < total; a++ {
@@ -27,18 +27,11 @@ func main() {
 			printProgressBar(float32(a) / float32(total))
 			continue
 		}
+
 		fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
 	}
 	close(results)
-	fmt.Printf("\n")
-	msg := "Average respond time for"
-	for k, v := range m {
-		var sum time.Duration
-		for _, s := range v {
-			sum = sum + s
-		}
-		fmt.Printf("%s %s: %s\n", aurora.Yellow(msg), aurora.Green(k), aurora.Magenta(sum/time.Duration(*count)))
-	}
+	printTable(m, *count)
 }
 
 // Result ...
@@ -77,12 +70,34 @@ var progressBar string
 func init() {
 	colors := []uint8{57, 93, 129, 165, 201}
 	for _, c := range colors {
-		progressBar += aurora.Index(c, "■ ■ ■ ■ ").String()
+		progressBar += aurora.Index(c, "■ ■ ■ ■ ■ ").String()
 	}
 }
 func printProgressBar(percent float32) {
 	size := utf8.RuneCountInString(progressBar)
 	index := int(float32(size) * float32(percent))
 	bar := string([]rune(progressBar)[0:index])
-	fmt.Printf("\r  %s %%%d", bar, int(percent*100))
+	fmt.Printf("\r %s %%%d", bar, int(percent*100))
+}
+
+func printTable(m map[string][]time.Duration, c int) {
+	msg := "average respond time (ms)"
+	fmt.Printf("\n")
+	fmt.Printf("%s", strings.Repeat("╌╌", 28))
+	fmt.Printf("\n")
+	fmt.Printf("%13s %12s %s %4s", "URL", "┆", msg, "┆")
+	fmt.Printf("\n")
+	fmt.Printf("%s", strings.Repeat("╌╌", 28))
+	fmt.Printf("\n")
+	pad := " "
+	for k, v := range m {
+		var sum time.Duration
+		var d time.Duration
+		for _, s := range v {
+			sum = sum + s
+		}
+		average := sum / time.Duration(c)
+		d, _ = time.ParseDuration(average.String())
+		fmt.Printf("  %s %s %d %s %s\n", aurora.Index(46, k), strings.Repeat(pad, 34-len(k)), aurora.Index(198, int(d)/1000000), strings.Repeat(pad, 13), aurora.Index(201, "┆"))
+	}
 }
