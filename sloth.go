@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -70,6 +71,7 @@ var progressBar string
 func init() {
 	colors := []uint8{57, 93, 129, 165, 201}
 	for _, c := range colors {
+		// bg := 138 - len(progressBar)
 		progressBar += aurora.Index(c, "■ ■ ■ ■ ■ ").String()
 	}
 }
@@ -81,23 +83,25 @@ func printProgressBar(percent float32) {
 }
 
 func printTable(m map[string][]time.Duration, c int) {
-	msg := "average respond time (ms)"
+	// tableSize := 60
+	urlColumnSize := 30
+	durationColumnSize := 10
 	fmt.Printf("\n")
-	fmt.Printf("%s", strings.Repeat("╌╌", 28))
+	msg := "average(ms)"
+	fmt.Printf("%30s %40s", "URL", msg)
 	fmt.Printf("\n")
-	fmt.Printf("%13s %12s %s %4s", "URL", "┆", msg, "┆")
+	fmt.Printf("%s", strings.Repeat("╌╌", 23))
 	fmt.Printf("\n")
-	fmt.Printf("%s", strings.Repeat("╌╌", 28))
-	fmt.Printf("\n")
-	pad := " "
 	for k, v := range m {
 		var sum time.Duration
 		var d time.Duration
 		for _, s := range v {
 			sum = sum + s
 		}
+		pad := " "
 		average := sum / time.Duration(c)
 		d, _ = time.ParseDuration(average.String())
-		fmt.Printf("  %s %s %d %s %s\n", aurora.Index(46, k), strings.Repeat(pad, 34-len(k)), aurora.Index(198, int(d)/1000000), strings.Repeat(pad, 13), aurora.Index(201, "┆"))
+		p := durationColumnSize - len(strconv.Itoa(int(d)/1000000))
+		fmt.Printf("  %s %s %d %s %s\n", aurora.Index(46, k), strings.Repeat(pad, urlColumnSize-len(k)), aurora.Index(198, int(d)/1000000), strings.Repeat(pad, p), aurora.Index(201, "┆"))
 	}
 }
