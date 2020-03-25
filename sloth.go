@@ -8,7 +8,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"unicode/utf8"
 
 	"github.com/logrusorgru/aurora"
 )
@@ -21,11 +20,12 @@ func main() {
 	total := len(urls) * *count
 	m := map[string][]time.Duration{}
 	go Sloth(urls, *count, results)
+	fmt.Printf("\n")
 	for a := 0; a < total; a++ {
 		r := <-results
 		m[r.URL] = append(m[r.URL], r.Duration)
 		if r.Error == nil {
-			printProgressBar(float32(a) / float32(total))
+			printProgressBar(float32(a)/float32(total), int(total))
 			continue
 		}
 
@@ -67,18 +67,28 @@ func Sloth(urls []string, count int, res chan Result) {
 }
 
 var progressBar string
+var background string
 
-func init() {
-	colors := []uint8{57, 93, 129, 165, 201}
-	for _, c := range colors {
-		progressBar += aurora.Index(c, "■ ■ ■ ■ ■ ").String()
-	}
-}
-func printProgressBar(percent float32) {
-	size := utf8.RuneCountInString(progressBar)
-	index := int(float32(size) * float32(percent))
-	bar := string([]rune(progressBar)[0:index])
-	fmt.Printf("\r %s %%%d", bar, int(percent*100))
+// func init() {
+// 	colors := []uint8{57, 93, 129, 165, 201}
+// 	for _, c := range colors {
+// 		fmt.Println(c)
+// 		progressBar += aurora.Index(c, "■■■■■").String()
+// 		background += aurora.Index(c, "▢▢▢▢▢").String()
+// 	}
+// 	fmt.Println(len(progressBar))
+// 	fmt.Println(len(background))
+// }
+
+func printProgressBar(percent float32, width int) {
+	fg := "█"
+	bg := "░"
+	filled := int(float32(width) * float32(percent))
+	unfilled := width - filled - 1
+	bar := strings.Repeat(bg, unfilled)
+	back := strings.Repeat(fg, filled)
+	// fmt.Printf("\r %s %s", back, bar)
+	fmt.Printf("\r %s %s", aurora.Index(57, back), aurora.Index(57, bar))
 }
 
 func printTable(m map[string][]time.Duration, c int) {
