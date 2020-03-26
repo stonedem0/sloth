@@ -43,6 +43,7 @@ func main() {
 		r := <-results
 		m[r.URL] = append(m[r.URL], r.Duration)
 		if r.Error == nil {
+			// Helps to avoid increasing of progress bar, limits it to one line.
 			if total > 100 {
 				total = 100
 			}
