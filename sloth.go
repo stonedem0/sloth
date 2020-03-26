@@ -43,6 +43,9 @@ func main() {
 		r := <-results
 		m[r.URL] = append(m[r.URL], r.Duration)
 		if r.Error == nil {
+			if total > 100 {
+				total = 100
+			}
 			progressbar.PrintProgressBar(float32(a)/float32(total), int(total))
 			continue
 		}
