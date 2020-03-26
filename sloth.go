@@ -97,31 +97,26 @@ func printTable(m map[string][]time.Duration, c int) {
 
 	// Erase progress bar
 	fmt.Printf("\033[1K")
+	fmt.Printf("\033[f")
 
 	// Column sizes
 	urlColumnSize := 30
 	durationColumnSize := 10
 
 	fmt.Printf("\n")
-	// fmt.Printf("\n")
-
-	msg := "average(ms)"
-	fmt.Printf("%s", strings.Repeat(aurora.Index(165, "--").String(), 23))
-	fmt.Printf("\n")
-	fmt.Printf("%10s %30s %4s", aurora.Index(165, "URL"), aurora.Index(165, msg), aurora.Index(165, "┆"))
-	fmt.Printf("\n")
-	fmt.Printf("%s", strings.Repeat(aurora.Index(165, "╌").String(), 44))
-	fmt.Printf("\n")
+	pad := " "
+	header := strings.Repeat(pad, 2) + "average(ms)" + strings.Repeat(pad, 17) + "URL" + strings.Repeat(pad, 7)
+	fmt.Printf(" %s\n", aurora.Index(213, header).BgIndex(93).Italic())
 	for k, v := range m {
 		var sum time.Duration
 		var d time.Duration
 		for _, s := range v {
 			sum = sum + s
 		}
-		pad := " "
 		average := sum / time.Duration(c)
 		d, _ = time.ParseDuration(average.String())
 		p := durationColumnSize - len(strconv.Itoa(int(d)/1000000))
-		fmt.Printf(" %s %s %d %s %s\n", aurora.Index(46, k), strings.Repeat(pad, urlColumnSize-len(k)), aurora.Index(198, int(d)/1000000), strings.Repeat(pad, p), aurora.Index(201, "┆"))
+		results := k + strings.Repeat(pad, urlColumnSize-len(k)) + strconv.Itoa(int(d)/1000000) + strings.Repeat(pad, p)
+		fmt.Printf(" %s\n", aurora.Index(255, results).BgIndex(57))
 	}
 }
