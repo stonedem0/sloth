@@ -10,10 +10,11 @@ import (
 	"github.com/stonedem0/sloth/progressbar"
 	"github.com/stonedem0/sloth/table"
 	"github.com/stonedem0/sloth/terminal"
+	"github.com/stonedem0/sloth/validator"
 )
 
 //TODO:
-// command validation
+// fix total for progress bar
 
 // ./pkg/sloth/sloth.go   library
 // ./cmd/sloth/main.go    command
@@ -25,6 +26,9 @@ func main() {
 	count := flag.Int("count", 10, "number of requests")
 	flag.Parse()
 	urls := flag.Args()
+	for _, u := range urls {
+		validator.URLValidator(u)
+	}
 	results := make(chan Result)
 	total := len(urls) * *count
 	m := map[string][]time.Duration{}
