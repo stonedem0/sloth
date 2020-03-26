@@ -11,6 +11,7 @@ import (
 
 	"github.com/logrusorgru/aurora"
 	"github.com/stonedem0/sloth/progressbar"
+	"github.com/stonedem0/sloth/terminal"
 )
 
 // ./pkg/sloth/sloth.go   library
@@ -26,7 +27,12 @@ func main() {
 	results := make(chan Result)
 	total := len(urls) * *count
 	m := map[string][]time.Duration{}
-	setupTerminal()
+
+	// Terminal setup
+	terminal.CleanTerminalScreen()
+	terminal.MoveCursorUpperLeft()
+	terminal.HideCursor()
+
 	go Sloth(urls, *count, results)
 	for a := 0; a < total; a++ {
 		r := <-results
@@ -39,6 +45,9 @@ func main() {
 	}
 	close(results)
 	printTable(m, *count)
+
+	//Show cursor
+	terminal.ShowCursor()
 }
 
 // Result ...
@@ -72,29 +81,14 @@ func Sloth(urls []string, count int, res chan Result) {
 	wg.Wait()
 }
 
-// func init() {
+// Gradient colors
 // 	colors := []uint8{57, 93, 129, 165, 201}
-// 	for _, c := range colors {
-// 		fmt.Println(c)
-// 		progressBar += aurora.Index(c, "■■■■■").String()
-// 		background += aurora.Index(c, "▢▢▢▢▢").String()
-// 	}
-// 	fmt.Println(len(progressBar))
-// 	fmt.Println(len(background))
-// }
-
-func setupTerminal() {
-	fmt.Printf("\033[2J")
-	fmt.Printf("\033[f")
-	fmt.Printf("\n")
-	fmt.Printf("\033[?25l")
-}
 
 func printTable(m map[string][]time.Duration, c int) {
 
 	// Erase progress bar
-	fmt.Printf("\033[1K")
-	fmt.Printf("\033[f")
+	terminal.MoveCursorUpperLeft()
+	terminal.EraseProgressBar()
 
 	// Column sizes
 	urlColumnSize := 30
