@@ -14,6 +14,9 @@ import (
 	"github.com/stonedem0/sloth/terminal"
 )
 
+//TODO:
+// command validation
+
 // ./pkg/sloth/sloth.go   library
 // ./cmd/sloth/main.go    command
 
@@ -44,6 +47,8 @@ func main() {
 		fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
 	}
 	close(results)
+	terminal.EraseProgressBar()
+	terminal.MoveCursorUpperLeft()
 	printTable(m, *count)
 
 	//Show cursor
@@ -86,17 +91,12 @@ func Sloth(urls []string, count int, res chan Result) {
 
 func printTable(m map[string][]time.Duration, c int) {
 
-	// Erase progress bar
-	terminal.EraseProgressBar()
-	terminal.MoveCursorUpperLeft()
-
 	// Column sizes
 	urlColumnSize := 30
 	durationColumnSize := 10
 
-	fmt.Printf("\n")
 	pad := " "
-	header := strings.Repeat(pad, 2) + "average(ms)" + strings.Repeat(pad, 17) + "URL" + strings.Repeat(pad, 7)
+	header := strings.Repeat(pad, 2) + "URL" + strings.Repeat(pad, 17) + "average(ms)" + strings.Repeat(pad, 7)
 	fmt.Printf(" %s\n", aurora.Index(213, header).BgIndex(93).Italic())
 	for k, v := range m {
 		var sum time.Duration
