@@ -19,8 +19,8 @@ func main() {
 	results := make(chan Result)
 	total := len(urls) * *count
 	m := map[string][]time.Duration{}
+	setupTerminal()
 	go Sloth(urls, *count, results)
-	fmt.Printf("\n")
 	for a := 0; a < total; a++ {
 		r := <-results
 		m[r.URL] = append(m[r.URL], r.Duration)
@@ -28,7 +28,6 @@ func main() {
 			printProgressBar(float32(a)/float32(total), int(total))
 			continue
 		}
-
 		fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
 	}
 	close(results)
@@ -66,9 +65,6 @@ func Sloth(urls []string, count int, res chan Result) {
 	wg.Wait()
 }
 
-var progressBar string
-var background string
-
 // func init() {
 // 	colors := []uint8{57, 93, 129, 165, 201}
 // 	for _, c := range colors {
@@ -85,24 +81,36 @@ func printProgressBar(percent float32, width int) {
 	bg := "░"
 	filled := int(float32(width) * float32(percent))
 	unfilled := width - filled - 1
-	bar := strings.Repeat(bg, unfilled)
-	back := strings.Repeat(fg, filled)
-	// fmt.Printf("\r %s %s", back, bar)
-	fmt.Printf("\r %s %s", aurora.Index(57, back), aurora.Index(57, bar))
+	fgBar := strings.Repeat(bg, unfilled)
+	bgBar := strings.Repeat(fg, filled)
+	fmt.Printf("\r %s %s %d %s", aurora.Index(57, bgBar), aurora.Index(57, fgBar), aurora.Index(57, int(percent*100)), aurora.Index(57, "%"))
+}
+
+func setupTerminal() {
+	fmt.Printf("\033[2J")
+	fmt.Printf("\033[f")
+	fmt.Printf("\n")
+	fmt.Printf("\033[?25l")
 }
 
 func printTable(m map[string][]time.Duration, c int) {
-	// tableSize := 60
+
+	// Erase progress bar
+	fmt.Printf("\033[1K")
+
+	// Column sizes
 	urlColumnSize := 30
 	durationColumnSize := 10
+
 	fmt.Printf("\n")
-	fmt.Printf("\n")
+	// fmt.Printf("\n")
+
 	msg := "average(ms)"
-	fmt.Printf("%s", strings.Repeat("╌*", 23))
+	fmt.Printf("%s", strings.Repeat(aurora.Index(165, "--").String(), 23))
 	fmt.Printf("\n")
-	fmt.Printf("%10s %30s %4s", "URL", msg, "┆")
+	fmt.Printf("%10s %30s %4s", aurora.Index(165, "URL"), aurora.Index(165, msg), aurora.Index(165, "┆"))
 	fmt.Printf("\n")
-	fmt.Printf("%s %s", strings.Repeat("╌", 44), "╋")
+	fmt.Printf("%s", strings.Repeat(aurora.Index(165, "╌").String(), 44))
 	fmt.Printf("\n")
 	for k, v := range m {
 		var sum time.Duration
