@@ -87,8 +87,8 @@ func Sloth(urls []string, count int, res chan Result) {
 func printTable(m map[string][]time.Duration, c int) {
 
 	// Erase progress bar
-	terminal.MoveCursorUpperLeft()
 	terminal.EraseProgressBar()
+	terminal.MoveCursorUpperLeft()
 
 	// Column sizes
 	urlColumnSize := 30
