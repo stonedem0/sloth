@@ -14,7 +14,7 @@ import (
 )
 
 //TODO:
-// fix total for progress bar
+// better error hangling
 
 // ./pkg/sloth/sloth.go   library
 // ./cmd/sloth/main.go    command
