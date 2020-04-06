@@ -11,6 +11,8 @@ import (
 	"github.com/stonedem0/sloth/table"
 	"github.com/stonedem0/sloth/terminal"
 	"github.com/stonedem0/sloth/validator"
+
+	"github.com/logrusorgru/aurora"
 )
 
 //TODO:
@@ -32,6 +34,7 @@ func main() {
 	results := make(chan Result)
 	total := len(urls) * *count
 	m := map[string][]time.Duration{}
+	errors := map[string][]error{}
 
 	// Terminal setup
 	terminal.CleanTerminalScreen()
@@ -42,21 +45,24 @@ func main() {
 	for a := 0; a < total; a++ {
 		r := <-results
 		m[r.URL] = append(m[r.URL], r.Duration)
+
 		if r.Error == nil {
-			// Helps to avoid increasing of progress bar, limits it to one line.
-			if total > 100 {
-				total = 100
-			}
-			progressbar.PrintProgressBar(float32(a)/float32(total), int(total))
+			progressbar.PrintProgressBar(float32(a) / float32(total))
 			continue
 		}
-		fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
+		// errors = append(errors, r.Error)
+		errors[r.URL] = append(errors[r.URL], r.Error)
+		// fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
 	}
 	close(results)
 	terminal.EraseProgressBar()
 	terminal.MoveCursorUpperLeft()
 	table.PrintTable(m, *count)
-
+	for url, e := range errors {
+		for _, err := range e {
+			fmt.Printf("%s has an error:\n %s\n", aurora.Index(118, url), aurora.Index(197, err))
+		}
+	}
 	//Show cursor
 	terminal.ShowCursor()
 }

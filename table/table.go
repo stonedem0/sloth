@@ -20,7 +20,6 @@ func PrintTable(m map[string][]time.Duration, c int) {
 	_ = sloth
 	header := strings.Repeat(pad, 4) + "URL" + strings.Repeat(pad, 20) + "average(ms)" + strings.Repeat(pad, 4)
 	fmt.Printf(" %s\n", aurora.Index(213, header).BgIndex(93).Bold())
-	fmt.Println("", aurora.Index(57, "▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚▞▚"))
 	for k, v := range m {
 		var sum time.Duration
 		var d time.Duration
