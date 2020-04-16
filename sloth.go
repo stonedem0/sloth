@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -28,6 +29,12 @@ func main() {
 	count := flag.Int("count", 10, "number of requests")
 	flag.Parse()
 	urls := flag.Args()
+
+	argsWithoutProg := os.Args[1:]
+	if len(argsWithoutProg) == 0 {
+		fmt.Println("HELP")
+	}
+
 	for _, u := range urls {
 		validator.URLValidator(u)
 	}
@@ -77,6 +84,14 @@ type Result struct {
 
 // Sloth ...
 func Sloth(urls []string, count int, res chan Result) {
+	// cl := &http.Client{
+	// 	Transport: &http.Transport{MaxConnsPerHost: 10},
+	// }
+	// tr := &http.Transport{
+	// 	MaxIdleConns:        20000,
+	// 	MaxIdleConnsPerHost: 20000,
+	// }
+	// cl := &http.Client{Transport: tr}
 	var wg sync.WaitGroup
 	wg.Add(len(urls) * count)
 	for _, val := range urls {
