@@ -14,15 +14,14 @@ const (
 
 // PrintProgressBar prints an awesome progress bar
 func PrintProgressBar(percent float32) {
-
-	width := 50
-	fg := "█"
+	width := 40
+	fg := "▇"
 	bg := "░"
 	filled := int(float32(width) * float32(percent))
 	unfilled := width - filled
 	fgBar := aurora.Index(softPink, strings.Repeat(bg, unfilled)).String()
 	bgBar := aurora.Index(softPink, strings.Repeat(fg, filled)).String()
-	fmt.Printf("\r %s %s %d %s", bgBar, fgBar, aurora.Index(softPink, int(percent*100)), aurora.Index(softPink, "%"))
+	fmt.Printf("\r %s%s %d %s", bgBar, fgBar, aurora.Index(softPink, int(percent*100)), aurora.Index(softPink, "%"))
 }
 
 // Gradient colors
