@@ -32,7 +32,11 @@ func main() {
 
 	argsWithoutProg := os.Args[1:]
 	if len(argsWithoutProg) == 0 {
-		fmt.Println("HELP")
+		slothMsg := "Hi. It's Sloth. Looks like you're trying to talk to me. Try some of these commands:\n"
+		commads := " • [urls]: list of URls for testing "
+		fmt.Printf("%s %s", aurora.Index(57, slothMsg), aurora.Index(201, commads))
+		// fmt.Println("Hi. It's Sloth. Looks like you're trying to talk to me. Try some of these commands:\n -count")
+		os.Exit(1)
 	}
 
 	for _, u := range urls {
