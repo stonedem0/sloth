@@ -28,22 +28,55 @@ func calculateResults(sl []time.Duration, c int) (time.Duration, time.Duration, 
 		}
 	}
 	average := sum / time.Duration(c)
-	// min = min / 1000000
-	// max = max / 1000000
 	return average, min, max
 }
 
 // Table is a struct with method
-// Method addRow
+// Method addRow(column count, slice of values)
+// Column size id slice[i] len + pads
+type Table struct {
+	columns []string
+	rows    string
+}
+
+func (t *Table) addRow(columns []string) {
+	columLength := 15
+	pad := " "
+	for _, v := range columns {
+		v += strings.Repeat(pad, columLength-len(v))
+		t.rows += v
+	}
+	t.rows += "\n"
+}
+
+func (t *Table) printTable() {
+	fmt.Printf("%+v\n", t.rows)
+}
+
+func drawTable() {
+	// pad := ""
+	t := Table{}
+	v := []string{"sssshi", "duxxxd", "hey"}
+	g := []string{"lol", "mxxxxxeh", "blh"}
+	k := []string{"hddi", "duddddddeh", "h"}
+	l := []string{"dsssd", "meddddddh", ""}
+	t.addRow(v)
+	t.addRow(g)
+	t.addRow(k)
+	t.addRow(l)
+	// fmt.Printf("%+v\n", t)
+	t.printTable()
+}
 
 // PrintTable accepts map of results and print a table with it.
 func PrintTable(m map[string][]time.Duration, c int) {
-
+	drawTable()
 	// Column sizes
 	tableSize := 60
 	urlColumnSize := 32
 	durationColumnSize := 15
 	pad := " "
+
 	bg := aurora.Index(purple, strings.Repeat("⭑ ", tableSize/2)).BgIndex(softPink)
 	// sloth := aurora.Index(softPink, "(ﾉ◕ヮ◕)ﾉ*:・ﾟ✧look at this*:・ﾟ✧")
 	header := strings.Repeat(pad, 4) + "URL" + strings.Repeat(pad, 19) + "average" + strings.Repeat(pad, 8) + "min" + strings.Repeat(pad, 8) + "max" + strings.Repeat(pad, 4)

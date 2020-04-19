@@ -86,14 +86,6 @@ type Result struct {
 
 // Sloth ...
 func Sloth(urls []string, count int, res chan Result) {
-	// cl := &http.Client{
-	// 	Transport: &http.Transport{MaxConnsPerHost: 10},
-	// }
-	// tr := &http.Transport{
-	// 	MaxIdleConns:        20000,
-	// 	MaxIdleConnsPerHost: 20000,
-	// }
-	// cl := &http.Client{Transport: tr}
 	var wg sync.WaitGroup
 	wg.Add(len(urls) * count)
 	for _, val := range urls {
