@@ -37,8 +37,6 @@ func calculateResults(t []time.Duration, c int, url string) []string {
 type Table struct {
 	columns    [][]string
 	rows       string
-	length     int
-	row        int
 	colSizes   []int
 	data       [][]string
 	bg         uint8
@@ -48,6 +46,7 @@ type Table struct {
 	header     string
 	headerBg   uint8
 	headerText uint8
+	margin     string
 }
 
 func (t *Table) saveColSizes(columns [][]string) []int {
@@ -77,73 +76,57 @@ func (t *Table) addHeader(headers []string, textColor uint8, bgColor uint8, padd
 	t.headers = append(headers)
 	t.headerBg = bgColor
 	t.headerText = textColor
-	// p := " "
-	// rows := ""
-	// rows += aurora.Index(textColor, strings.Repeat(pad, padding)).BgIndex(bgColor).String()
-	// for i, co := range headers {
-	// 	p = aurora.Index(textColor, strings.Repeat(pad, (t.colSizes[i]+padding)-len(co))).BgIndex(bgColor).String()
-	// 	rows += aurora.Index(textColor, co).BgIndex(bgColor).Bold().String() + p
-
-	// }
-	// rows += "\n"
-	// t.rows += rows
+	t.colSizes = make([]int, len(headers))
+	t.saveColSizes(t.data)
 
 }
 
-func (t *Table) printHeader(headers []string, textColor uint8, bgColor uint8, padding int) {
-	header := ""
+func (t *Table) printHeader(headers []string, textColor uint8, bgColor uint8, padding int) string {
 	p := " "
-	header += aurora.Index(t.text, strings.Repeat(pad, t.padding)).BgIndex(t.headerBg).String()
+	header := ""
+	header += aurora.Index(t.text, strings.Repeat(p, t.padding)).BgIndex(t.headerBg).String()
 	for i, co := range headers {
-		p = aurora.Index(t.headerText, strings.Repeat(pad, (t.colSizes[i]+padding)-len(co))).BgIndex(t.headerBg).String()
-		header += aurora.Index(t.headerText, co).BgIndex(t.headerBg).Bold().String() + p
-
+		header += aurora.Index(t.headerText, co).BgIndex(t.headerBg).Bold().String() + aurora.Index(t.headerText, strings.Repeat(p, (t.colSizes[i]+padding)-len(co))).BgIndex(t.headerBg).String()
 	}
 	t.header += header
+	return fmt.Sprintf("%v\n", t.header)
 }
 
-func (t *Table) addStars() {
-	t.rows += aurora.Index(purple, strings.Repeat("⭑ ", 32)).BgIndex(softPink).String()
-	t.rows += "\n"
+func (t *Table) addMargin(symbol string, color uint8, bg uint8) string {
+	t.margin += aurora.Index(color, strings.Repeat(symbol, 23)).BgIndex(bg).String()
+	t.margin += "\n"
+	return fmt.Sprintf("%v", t.margin)
 }
 
 //Printing all rows
-func (t *Table) printTable() {
+func (t *Table) formatTable() string {
 	p := " "
 	rows := ""
-	t.printHeader(t.headers, t.headerBg, t.headerText, t.padding)
-
+	header := t.printHeader(t.headers, t.headerBg, t.headerText, t.padding)
 	for _, c := range t.data {
-		rows += aurora.Index(t.text, strings.Repeat(pad, t.padding)).BgIndex(t.bg).String()
+		rows += aurora.Index(t.text, strings.Repeat(p, t.padding)).BgIndex(t.bg).String()
 		for i, co := range c {
-			p = aurora.Index(t.text, strings.Repeat(pad, (t.colSizes[i]+t.padding)-len(co))).BgIndex(t.bg).String()
-			rows += aurora.Index(t.text, co).BgIndex(t.bg).String() + p
+			rows += aurora.Index(t.text, co).BgIndex(t.bg).String() + aurora.Index(t.text, strings.Repeat(p, (t.colSizes[i]+t.padding)-len(co))).BgIndex(t.bg).String()
 		}
 		rows += "\n"
 	}
 	t.rows += rows
-	fmt.Printf("%+2v\n", t.header)
-	fmt.Printf("%+2v\n", t.rows)
+	return fmt.Sprintf("%v%v", header, t.rows)
 }
 
 // PrintTable accepts map of results and print a table with it.
 func PrintTable(m map[string][]time.Duration, c int) {
 	t := Table{}
-	data := [][]string{}
 	headers := []string{"URL", "average", "min", "max"}
-	// test := []string{"meh", "bleh", "dude", "123456789019293"}
 	t.addHeader(headers, softPink, purple, 3)
-
+	t.addMargin("⭑ ", purple, softPink)
 	for k, v := range m {
 		runes := []rune(k)
 		prettyURL := string(runes[8:])
 		t.addRow(calculateResults(v, c, prettyURL), purple, softPink, 3)
-		data = append(data, calculateResults(v, c, prettyURL))
 
 	}
-
-	// t.addRow(test, purple, softPink, 3)
-	t.printTable()
+	println(t.formatTable())
 
 }
 
