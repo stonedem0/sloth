@@ -16,15 +16,6 @@ import (
 	"github.com/logrusorgru/aurora"
 )
 
-//TODO:
-// better error hangling
-
-// ./pkg/sloth/sloth.go   library
-// ./cmd/sloth/main.go    command
-
-// ./sloth.go             library
-// ./cmd/sloth/main.go    command   imports github.com/stonedem0/sloth
-
 func main() {
 	count := flag.Int("count", 10, "number of requests")
 	flag.Parse()
@@ -59,9 +50,7 @@ func main() {
 			progressbar.PrintProgressBar(float32(a) / float32(total))
 			continue
 		}
-		// errors = append(errors, r.Error)
 		errors[r.URL] = append(errors[r.URL], r.Error)
-		// fmt.Printf("Response %d from %s has an error: %s\n", r.Index, r.URL, r.Error)
 	}
 	close(results)
 	terminal.EraseProgressBar()

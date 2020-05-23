@@ -23,11 +23,3 @@ func PrintProgressBar(percent float32) {
 	bgBar := aurora.Index(softPink, strings.Repeat(fg, filled)).String()
 	fmt.Printf("\r %s%s %d %s", bgBar, fgBar, aurora.Index(softPink, int(percent*100)), aurora.Index(softPink, "%"))
 }
-
-// func Print()
-
-// fmt.Println("\r%s", progessbar.Render())
-// Gradient colors
-// 	colors := []uint8{57, 93, 129, 165, 201m 201}
-// fgBar := aurora.Index(colors[filled/10], strings.Repeat(bg, unfilled)).String()
-// bgBar := aurora.Index(colors[filled/10], strings.Repeat(fg, filled)).String()
