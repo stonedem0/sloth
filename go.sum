@@ -1,4 +1,8 @@
 github.com/logrusorgru/aurora v0.0.0-20200102142835-e9ef32dff381 h1:bqDmpDG49ZRnB5PcgP0RXtQvnMSgIF14M7CBd2shtXs=
 github.com/logrusorgru/aurora v0.0.0-20200102142835-e9ef32dff381/go.mod h1:7rIyQOR62GCctdiQpZ/zOJlFyk6y+94wXzv6RNZgaR4=
+github.com/logrusorgru/aurora v2.0.3+incompatible h1:tOpm7WcpBTn4fjmVfgpQq0EfczGlG91VSDkswnjF5A8=
+github.com/logrusorgru/aurora v2.0.3+incompatible/go.mod h1:7rIyQOR62GCctdiQpZ/zOJlFyk6y+94wXzv6RNZgaR4=
 github.com/stonedem0/roti v0.0.0-20200423165933-ec05f3ec4c86 h1:gPceR2gz5J1j35nY4w+HTGMex05T9tQ/AfYnNOt5DII=
 github.com/stonedem0/roti v0.0.0-20200423165933-ec05f3ec4c86/go.mod h1:rOcqRSEUnj6uS5Wv0RB89Aa4ZwH1MyqqQMQYKcy2vNU=
+github.com/stonedem0/tofu v0.0.0-20200812165329-874d3908be59 h1:FW250CuFgBaDN+6YQiGrYQHZ+zmYCfrRHPoqSgUm8kI=
+github.com/stonedem0/tofu v0.0.0-20200812165329-874d3908be59/go.mod h1:rEnyAZZvUog9mwpoAghbj8s6NapIrTdbe2PhxzKfoh0=

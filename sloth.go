@@ -8,29 +8,37 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stonedem0/sloth/progressbar"
 	"github.com/stonedem0/sloth/table"
 	"github.com/stonedem0/sloth/terminal"
 	"github.com/stonedem0/sloth/validator"
 
 	"github.com/logrusorgru/aurora"
+	"github.com/stonedem0/tofu"
+)
+
+const (
+	softPink = 213
+	purple   = 57
 )
 
 func main() {
+	t := tofu.ProgressBarStr{}
 	count := flag.Int("count", 10, "number of requests")
 	flag.Parse()
 	urls := flag.Args()
-
 	argsWithoutProg := os.Args[1:]
+
 	if len(argsWithoutProg) == 0 {
 		slothMsg := "Hi. It's Sloth. Looks like you're trying to talk to me. Try some of these commands:\n"
 		commads := " • [urls]: list of URls for testing "
 		fmt.Printf("%s %s", aurora.Index(57, slothMsg), aurora.Index(201, commads))
 		os.Exit(1)
 	}
+
 	for _, u := range urls {
 		validator.URLValidator(u)
 	}
+
 	results := make(chan Result)
 	total := len(urls) * *count
 	m := map[string][]time.Duration{}
@@ -47,7 +55,8 @@ func main() {
 		m[r.URL] = append(m[r.URL], r.Duration)
 
 		if r.Error == nil {
-			progressbar.PrintProgressBar(float32(a) / float32(total))
+			t.ProgressBar(float32(a)/float32(total), 40, softPink, "▇", "░")
+			t.PrintProgressBar()
 			continue
 		}
 		errors[r.URL] = append(errors[r.URL], r.Error)
